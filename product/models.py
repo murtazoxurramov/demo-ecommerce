@@ -88,6 +88,7 @@ class ProductDiscount(models.Model):
         if self.is_active():
             return self.apply_discount(self.product.price)
         else:
+            ProductDiscount.objects.filter(id=self.pk).delete()
             return self.product.price
 
     def is_active(self):
