@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.db import models
+from django.utils import timezone
 from django.utils.text import slugify
 
 
@@ -6,7 +8,8 @@ class ProductCategory(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(blank=True, null=True)
     parent = models.ForeignKey(
-        'self', on_delete=models.CASCADE, related_name='child', null=True, blank=True)
+        'self', on_delete=models.CASCADE, related_name='child', null=True, blank=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -15,17 +18,20 @@ class ProductCategory(models.Model):
         verbose_name = 'Product Category'
         verbose_name_plural = 'Product Categories'
 
+    def __str__(self):
+        return self.title
+
     def save(self, *args, **kwargs):
         self.slug = slugify(self.title)
         super(ProductCategory, self).save(*args, **kwargs)
 
-    def __str__(self):
-        return self.title
-
 
 class Product(models.Model):
     title = models.CharField(max_length=255)
-    prize = models.CharField(max_length=255)
+    category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    # discount = models.OneToOneField(
+    #     'ProductDiscount', on_delete=models.SET_NULL, blank=True, null=True)
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -41,6 +47,7 @@ class Product(models.Model):
 
 class ProductImage(models.Model):
     image = models.ImageField(upload_to='uploads/product')
+    is_main = models.BooleanField(default=False)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -53,10 +60,18 @@ class ProductImage(models.Model):
     def __str__(self):
         return self.product.title
 
+    @property
+    def image_url(self):
+        if self.image:
+            return "%s%s" % (settings.HOST, self.image.url)
+
 
 class ProductDiscount(models.Model):
-    discount_percent = models.IntegerField()
+    name = models.CharField(max_length=255, blank=True, null=True)
+    percent_off = models.DecimalField(max_digits=5, decimal_places=2)
     product = models.OneToOneField(Product, on_delete=models.CASCADE)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -65,14 +80,20 @@ class ProductDiscount(models.Model):
         verbose_name = 'Product Discount'
         verbose_name_plural = 'Product Discounts'
 
-    def save(self, *args, **kwargs):
-        discount = (int(self.product.prize) / 100) * self.discount_percent
-        result = int(self.product.prize) - int(discount)
-        changed_prize = Product.objects.filter(
-            id=self.product.pk).get(id=self.product.pk)
-        changed_prize.prize = result
-        changed_prize.save()
-        super(ProductDiscount, self).save(*args, **kwargs)
-
     def __str__(self):
-        return self.product.title
+        return self.name
+
+    @property
+    def discounted_price(self):
+        if self.is_active():
+            return self.apply_discount(self.product.price)
+        else:
+            return self.product.price
+
+    def is_active(self):
+        now = timezone.now()
+        return self.start_date <= now and self.end_date >= now
+
+    def apply_discount(self, price):
+        return price * (1 - self.percent_off / 100)
+
