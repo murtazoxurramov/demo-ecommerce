@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from .models import Product, ProductCategory, ProductDiscount, ProductImage
 
 
@@ -42,8 +43,7 @@ class ProductMainSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'title', 'price',
-                  'discount', 'image']
+        fields = ['id', 'title', 'price', 'shop', 'discount', 'image']
 
     def get_discount(self, obj):
         discount = ProductDiscount.objects.filter(product=obj)
@@ -64,8 +64,10 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'title', 'category', 'price',
-                  'discount', 'description', 'images']
+        fields = [
+            'id', 'title', 'category', 'price',
+            'shop', 'discount', 'description', 'images'
+        ]
 
     def get_discount(self, obj):
         discount = ProductDiscount.objects.filter(product=obj)

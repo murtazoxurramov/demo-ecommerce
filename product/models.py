@@ -3,6 +3,8 @@ from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
 
+from account.models import Shop
+
 
 class ProductCategory(models.Model):
     title = models.CharField(max_length=255)
@@ -28,10 +30,9 @@ class ProductCategory(models.Model):
 
 class Product(models.Model):
     title = models.CharField(max_length=255)
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
     category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    # discount = models.OneToOneField(
-    #     'ProductDiscount', on_delete=models.SET_NULL, blank=True, null=True)
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -97,4 +98,3 @@ class ProductDiscount(models.Model):
 
     def apply_discount(self, price):
         return price * (1 - self.percent_off / 100)
-
