@@ -3,12 +3,11 @@ from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
 
-from account.models import Shop
+from shop.models import Shop
 
 
 class ProductCategory(models.Model):
     title = models.CharField(max_length=255)
-    slug = models.SlugField(blank=True, null=True)
     parent = models.ForeignKey(
         'self', on_delete=models.CASCADE, related_name='child', null=True, blank=True
     )
