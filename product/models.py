@@ -1,36 +1,12 @@
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
-from django.utils.text import slugify
-
 from shop.models import Shop
-
-
-class ProductCategory(models.Model):
-    title = models.CharField(max_length=255)
-    parent = models.ForeignKey(
-        'self', on_delete=models.CASCADE, related_name='child', null=True, blank=True
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        db_table = 'product_category'
-        verbose_name = 'Product Category'
-        verbose_name_plural = 'Product Categories'
-
-    def __str__(self):
-        return self.title
-
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.title)
-        super(ProductCategory, self).save(*args, **kwargs)
 
 
 class Product(models.Model):
     title = models.CharField(max_length=255)
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
-    category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)

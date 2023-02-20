@@ -9,6 +9,11 @@ ORDINARY_USER, VENDOR, SUPER_USER = (
     "vendor",
     "super_user"
 )
+VIA_USERNAME, VIA_PHONE, VIA_EMAIL = (
+    "via_username",
+    "via_phone",
+    "via_email",
+)
 
 
 class BaseModel(models.Model):
@@ -30,17 +35,23 @@ class User(AbstractUser, BaseModel):
         (VENDOR, VENDOR),
         (SUPER_USER, SUPER_USER)
     )
+    AUTH_TYPE_CHOICES = (
+        (VIA_PHONE, VIA_PHONE),
+        (VIA_EMAIL, VIA_EMAIL),
+        (VIA_USERNAME, VIA_USERNAME)
+    )
 
     user_roles = models.CharField(
         max_length=31, choices=USER_ROLES, default=ORDINARY_USER
     )
+    auth_type = models.CharField(max_length=31, choices=AUTH_TYPE_CHOICES, default=VIA_USERNAME)
     profile_image = models.ImageField(
         upload_to='upload/user', blank=True, null=True
     )
     phone_number = models.CharField(
-        max_length=12, null=True, unique=True, validators=[_validate_phone]
+        max_length=12, blank=True, null=True, unique=True, validators=[_validate_phone]
     )
-    email = models.EmailField(unique=True, blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
 
     objects = UserManager()
 

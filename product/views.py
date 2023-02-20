@@ -1,20 +1,13 @@
 from rest_framework import viewsets
 
-from .models import Product, ProductCategory
-from .serializers import ProductCategorySerializer, ProductMainSerializer, ProductDetailSerializer
+from .models import Product
+from .serializers import ProductMainSerializer, ProductDetailSerializer
 
 class CustomModelViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = self.queryset
 
         return queryset
-
-
-class ProductCategoryModelViewSet(CustomModelViewSet):
-    queryset = ProductCategory.objects.all()
-    serializer_class = ProductCategorySerializer
-    pagination_class = None
-    http_method_names = ['get']
 
 
 class ProductModelViewSet(CustomModelViewSet):

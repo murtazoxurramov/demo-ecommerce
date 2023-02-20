@@ -1,11 +1,14 @@
 from django.conf import settings
 from django.db import models
+from django.utils.text import slugify
 
 from profile.models import VendorProfile
 
 
 class ShopCategory(models.Model):
     title = models.CharField(max_length=255)
+    slug = models.SlugField()
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='child', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_ar = models.DateTimeField(auto_now=True)
 
@@ -15,7 +18,16 @@ class ShopCategory(models.Model):
         verbose_name_plural = 'Shop Categories'
 
     def __str__(self):
-        return self.title
+        full_path = [self.title]
+        k = self.parent
+        while k is not None:
+            full_path.append(k.title)
+            k = k.parent
+        return ' -> '.join(full_path[::-1])
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.title)
+        super(ShopCategory, self).save(*args, **kwargs)
 
 
 class Shop(models.Model):
@@ -45,4 +57,3 @@ class Shop(models.Model):
     def logo_url(self):
         if self.logo:
             return "%s%s" % (settings.HOST, self.logo.url)
-

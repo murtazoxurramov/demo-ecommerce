@@ -1,26 +1,6 @@
 from rest_framework import serializers
 
-from .models import Product, ProductCategory, ProductDiscount, ProductImage
-
-
-class ProductCategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductCategory
-        fields = ['id', 'title', 'slug']
-
-
-class ProductSubCategoryerializer(serializers.ModelSerializer):
-    child = serializers.SerializerMethodField()
-
-    class Meta:
-        model = ProductCategory
-        fields = ['id', 'title', 'slug', 'child']
-
-    def get_child(self, obj):
-        sub_menu = ProductCategory.objects.filter(parent=obj)
-        if sub_menu.exists():
-            return ProductSubCategoryerializer(sub_menu, many=True).data
-        return []
+from .models import Product, ProductDiscount, ProductImage
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
