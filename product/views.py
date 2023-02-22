@@ -3,14 +3,8 @@ from rest_framework import viewsets
 from .models import Product
 from .serializers import ProductMainSerializer, ProductDetailSerializer
 
-class CustomModelViewSet(viewsets.ModelViewSet):
-    def get_queryset(self):
-        queryset = self.queryset
 
-        return queryset
-
-
-class ProductModelViewSet(CustomModelViewSet):
+class ProductModelViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductMainSerializer
     pagination_class = None

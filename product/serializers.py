@@ -6,7 +6,7 @@ from .models import Product, ProductDiscount, ProductImage
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
-        fields = ['id', 'image_url']
+        fields = ['id', 'image']
 
 
 class ProductDiscountSerializer(serializers.ModelSerializer):
@@ -45,8 +45,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = [
-            'id', 'title', 'category', 'price',
-            'shop', 'discount', 'description', 'images'
+            'id', 'title', 'price', 'shop', 'description', 'discount', 'images'
         ]
 
     def get_discount(self, obj):
@@ -56,7 +55,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         return []
 
     def get_images(self, obj):
-        images = ProductImage.objects(product=obj)
+        images = ProductImage.objects.filter(product=obj)
         if images.count() != 1:
             images = images.filter(is_main=False)
             return ProductImageSerializer(images, many=True).data

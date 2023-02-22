@@ -7,7 +7,7 @@ from profile.models import VendorProfile
 
 class ShopCategory(models.Model):
     title = models.CharField(max_length=255)
-    slug = models.SlugField()
+    slug = models.SlugField(blank=True)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='child', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_ar = models.DateTimeField(auto_now=True)
