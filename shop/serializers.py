@@ -1,19 +1,15 @@
 from rest_framework import serializers
 
-from .models import Shop, ShopCategory
 from product.models import Product
 from product.serializers import ProductDetailSerializer, ProductListSerializer
+
+from .models import Shop, ShopCategory
+
 
 class SubCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ShopCategory
         fields = ['id', 'title', 'slug']
-
-
-# class CategoryLogoSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = MainPageSettings
-#         fields = ['logo_url']
 
 
 class ShopCategorySerializer(serializers.ModelSerializer):
@@ -48,4 +44,3 @@ class ShopDetailSerializer(serializers.ModelSerializer):
     def get_products(self, obj):
         product = Product.objects.filter(shop=obj)
         return ProductListSerializer(product, many=True).data
-
