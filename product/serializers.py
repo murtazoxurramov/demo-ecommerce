@@ -17,7 +17,7 @@ class ProductDiscountSerializer(serializers.ModelSerializer):
                   'discounted_price', 'start_date', 'end_date']
 
 
-class ProductMainSerializer(serializers.ModelSerializer):
+class ProductListSerializer(serializers.ModelSerializer):
     discount = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
 

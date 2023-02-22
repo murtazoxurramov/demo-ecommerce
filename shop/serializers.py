@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
-from profile.models import VendorProfile
 from .models import Shop, ShopCategory
-
+from product.models import Product
+from product.serializers import ProductDetailSerializer, ProductListSerializer
 
 class SubCategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -37,19 +37,15 @@ class ShopListSerializer(serializers.ModelSerializer):
 
 
 class ShopDetailSerializer(serializers.ModelSerializer):
+    products = serializers.SerializerMethodField()
+
     class Meta:
         model = Shop
         fields = [
-            'id', 'name', 'ordinal_number', 'logo', 'latitude', 'longitude', 'category', 'owner', 'address', 'bio'
+            'id', 'name', 'ordinal_number', 'logo', 'latitude', 'longitude', 'category', 'owner', 'address', 'bio', 'products'
         ]
 
+    def get_products(self, obj):
+        product = Product.objects.filter(shop=obj)
+        return ProductListSerializer(product, many=True).data
 
-class VendorShopSerializer(serializers.ModelSerializer):
-    vendor = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Shop
-        fields = ['id', 'name', 'logo', 'ordinal_number', 'vendor']
-
-    def get_vendor(self, obj):
-        vendor = Shop.objects.filter(owner=obj)

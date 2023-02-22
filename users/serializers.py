@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from .models import User
 
 from .authentication import EmailOrPhoneBackend
 
@@ -21,3 +22,9 @@ class EmailOrPhoneTokenObtainPairSerializer(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
+
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name', 'profile_image', 'phone_number', 'email']
