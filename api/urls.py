@@ -1,4 +1,4 @@
-from profile.views import VendorProfileShopDetailViewSet, VendorProfileViewSet
+from profile.views import VendorProfileViewSet
 
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
@@ -21,9 +21,6 @@ router.register(
 router.register(
     r'vendor-profile', VendorProfileViewSet, basename='vendor-profile'
 )
-# router.register(
-#     r'vendor-profile/{pk}/shops', VendorProfileShopDetailViewSet, basename='vendor-shop'
-# )
 
 
 urlpatterns = [
