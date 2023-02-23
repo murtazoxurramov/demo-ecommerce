@@ -7,33 +7,46 @@ from product.serializers import ProductListSerializer
 from shop.models import Shop
 
 from .models import VendorProfile
-from .serializers import VendorProfileSerializer
+from .serializers import (VendorProfileSerializer,
+                          VendorProfileShopListSerializer,
+                          VendorProfileShopSerializer)
 
 
-class VendorProfileViewSet(viewsets.ModelViewSet):
+class CustomModalViewSet(viewsets.ModelViewSet):
+    def get_queryset(self):
+        queryset = self.queryset
+        if hasattr(self.queryset.model, 'title'):
+            queryset = self.queryset.exclude(title__exact='')
+
+        return queryset
+
+
+class VendorProfileViewSet(CustomModalViewSet):
     queryset = VendorProfile.objects.all()
     serializer_class = VendorProfileSerializer
     pagination_class = None
     http_method_names = ['get']
 
+    @action(methods=['get'], detail=True)
+    def shops(self, request, pk=None):
+        queryset = VendorProfile.objects.all()
+        data = VendorProfileShopListSerializer(queryset, many=True).data
+        return Response(data=data, status=status.HTTP_200_OK)
 
-# class VendorShopListViewSet(viewsets.ModelViewSet):
-#     queryset = VendorProfile.objects.all()
-#     serializer_class = VendorShopListSerializer
-#     pagination_class = None
-#     http_method_names = ['get']
+    @action(methods=['get'], detail=True, url_path='shops/(?P<shop_id>[^/.]+)')
+    def shop_detail(self, request, pk=None, shop_id=None):
+        data = VendorProfileShopSerializer(shop_id, many=True).data
+        return Response(data=data, status=status.HTTP_200_OK)
 
 
-# class VendorShopDetailViewSet(viewsets.ModelViewSet):
-#     queryset = VendorProfile.objects.all()
-#     serializer_class = VendorShopDetailSerializer
-#     pagination_class = None
-#     http_method_names = ['get']
+class VendorProfileShopDetailViewSet(CustomModalViewSet):
+    queryset = VendorProfile.objects.all()
+    serializer_class = VendorProfileShopSerializer
+    pagination_class = None
+    http_method_names = ['get']
 
-#     @action(detail=True, methods=['get'])
-#     def get_products(self, request, pk=None):
-#         user = self.get_queryset()
-#         shop = Shop.objects.filter(owner=user)
-#         product = Product.objects.filter(shop=shop)
-#         serializer = ProductListSerializer(product, many=True).data
-#         return Response(serializer.data)
+    # @action(methods=['get'], detail=True)
+    # def shops(self, request, pk=None):
+    #     queryset = VendorProfile.objects.all()
+    #     data = VendorProfileShopSerializer(queryset, many=True).data
+    #     return Response(data=data, status=status.HTTP_200_OK)
