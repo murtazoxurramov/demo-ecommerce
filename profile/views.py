@@ -24,16 +24,15 @@ class VendorProfileViewSet(CustomModalViewSet):
     queryset = VendorProfile.objects.all()
     serializer_class = VendorProfileSerializer
     pagination_class = None
-    # http_method_names = ['get', 'post', 'put', 'delete']
     http_method_names = ['get']
 
-    @action(methods=['get'], detail=True, url_path='shops')
+    @action(methods=['get'], detail=True)
     def shops(self, request, pk=None):
         queryset = Shop.objects.filter(owner=pk)
         data = ShopListSerializer(queryset, many=True).data
         return Response(data=data, status=status.HTTP_200_OK)
 
-    @action(methods=['get'], detail=True, url_path='shops/(?P<shop_id>[^/.]+)')
+    @action(methods=['get', 'post'], detail=True, url_path='shops/(?P<shop_id>[^/.]+)')
     def shop_detail(self, request, pk=None, shop_id=None):
         obj = Shop.objects.filter(pk=shop_id)
         data = ShopDetailSerializer(obj, many=True).data
@@ -45,7 +44,7 @@ class VendorProfileViewSet(CustomModalViewSet):
         data = ProductListSerializer(queryset, many=True).data
         return Response(data=data, status=status.HTTP_200_OK)
 
-    @action(methods=['get'], detail=True, url_path='shops/(?P<shop_id>[^/.]+)/products/(?P<product_id>[^/.]+)')
+    @action(methods=['get', 'post'], detail=True, url_path='shops/(?P<shop_id>[^/.]+)/products/(?P<product_id>[^/.]+)')
     def product_detail(self, request, pk=None, shop_id=None, product_id=None):
         queryset = Product.objects.filter(pk=product_id)
         data = ProductDetailSerializer(queryset, many=True).data

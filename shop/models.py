@@ -1,21 +1,22 @@
+from profile.models import VendorProfile
+
 from django.conf import settings
 from django.db import models
 from django.utils.text import slugify
 
-from profile.models import VendorProfile
 
-
-class ShopCategory(models.Model):
+class Category(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(blank=True)
-    parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='child', blank=True, null=True)
+    parent = models.ForeignKey(
+        'self', on_delete=models.CASCADE, related_name='child', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_ar = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = 'shop_category'
-        verbose_name = 'Shop Category'
-        verbose_name_plural = 'Shop Categories'
+        db_table = 'category'
+        verbose_name = 'Category'
+        verbose_name_plural = 'Categories'
 
     def __str__(self):
         full_path = [self.title]
@@ -27,7 +28,7 @@ class ShopCategory(models.Model):
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.title)
-        super(ShopCategory, self).save(*args, **kwargs)
+        super(Category, self).save(*args, **kwargs)
 
 
 class Shop(models.Model):
@@ -36,7 +37,7 @@ class Shop(models.Model):
     logo = models.FileField(upload_to='upload/market', blank=True, null=True)
     latitude = models.FloatField()
     longitude = models.FloatField()
-    category = models.ForeignKey(ShopCategory, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
     owner = models.ForeignKey(
         VendorProfile, on_delete=models.SET_NULL, related_name='vendor', blank=True, null=True
     )

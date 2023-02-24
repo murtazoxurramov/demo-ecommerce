@@ -3,24 +3,24 @@ from rest_framework import serializers
 from product.models import Product
 from product.serializers import ProductDetailSerializer, ProductListSerializer
 
-from .models import Shop, ShopCategory
+from .models import Category, Shop
 
 
 class SubCategorySerializer(serializers.ModelSerializer):
     class Meta:
-        model = ShopCategory
+        model = Category
         fields = ['id', 'title', 'slug']
 
 
-class ShopCategorySerializer(serializers.ModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
     child = serializers.SerializerMethodField()
 
     class Meta:
-        model = ShopCategory
+        model = Category
         fields = ['id', 'title', 'slug', 'child']
 
     def get_child(self, obj):
-        sub_category = ShopCategory.objects.filter(parent=obj)
+        sub_category = Category.objects.filter(parent=obj)
         if sub_category.exists():
             return SubCategorySerializer(sub_category, many=True).data
         return []

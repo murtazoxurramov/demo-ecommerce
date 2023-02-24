@@ -1,7 +1,8 @@
-from rest_framework import viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, viewsets
 
-from .models import Shop, ShopCategory
-from .serializers import (ShopCategorySerializer, ShopDetailSerializer,
+from .models import Category, Shop
+from .serializers import (CategorySerializer, ShopDetailSerializer,
                           ShopListSerializer)
 
 
@@ -15,8 +16,8 @@ class CustomModalViewSet(viewsets.ModelViewSet):
 
 
 class ShopCategoryViewSet(CustomModalViewSet):
-    queryset = ShopCategory.objects.filter(parent__isnull=True)
-    serializer_class = ShopCategorySerializer
+    queryset = Category.objects.filter(parent__isnull=True)
+    serializer_class = CategorySerializer
     pagination_class = None
     http_method_names = ['get']
 
@@ -26,6 +27,9 @@ class ShopViewSet(CustomModalViewSet):
     serializer_class = ShopListSerializer
     pagination_class = None
     http_method_names = ['get']
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['category']
+    search_fields = ['name']
 
     def get_serializer_class(self):
         if self.action == 'retrieve':
