@@ -1,6 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, viewsets
-
+from rest_framework import filters, viewsets, status, response
 from .models import Category, Shop
 from .serializers import (CategorySerializer, ShopDetailSerializer,
                           ShopListSerializer)

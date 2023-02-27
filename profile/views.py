@@ -26,26 +26,42 @@ class VendorProfileViewSet(CustomModalViewSet):
     pagination_class = None
     http_method_names = ['get']
 
-    @action(methods=['get'], detail=True)
-    def shops(self, request, pk=None):
-        queryset = Shop.objects.filter(owner=pk)
-        data = ShopListSerializer(queryset, many=True).data
+
+class VendorProfileShopsViewSet(CustomModalViewSet):
+    queryset = Shop.objects.all()
+    serializer_class = ShopListSerializer
+
+    def list(self, request, user_pk=None):
+        obj = Shop.objects.filter(owner=user_pk).prefetch_related('owner')
+        data = ShopListSerializer(obj, many=True).data
         return Response(data=data, status=status.HTTP_200_OK)
 
-    @action(methods=['get', 'post'], detail=True, url_path='shops/(?P<shop_id>[^/.]+)')
-    def shop_detail(self, request, pk=None, shop_id=None):
-        obj = Shop.objects.filter(pk=shop_id)
-        data = ShopDetailSerializer(obj, many=True).data
+    def retrieve(self, request, user_pk=None, pk=None):
+        obj = Shop.objects.filter(owner=user_pk).prefetch_related(
+            'owner').filter(pk=pk)
+        if obj.exists():
+            data = ShopDetailSerializer(obj, many=True).data
+            return Response(data=data, status=status.HTTP_200_OK)
+        else:
+            data = {'Message': "Not Foud"}
+            return Response(data=data, status=status.HTTP_404_NOT_FOUND)
+
+
+class VendorProdileProducts(CustomModalViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductListSerializer
+
+    def list(self, request, user_pk=None, shop_pk=None):
+        obj = self.queryset.filter(shop=shop_pk).prefetch_related('shop')
+        data = self.serializer_class(obj, many=True).data
         return Response(data=data, status=status.HTTP_200_OK)
 
-    @action(methods=['get'], detail=True, url_path='shops/(?P<shop_id>[^/.]+)/products')
-    def products(self, request, pk=None, shop_id=None):
-        queryset = Product.objects.filter(shop=shop_id)
-        data = ProductListSerializer(queryset, many=True).data
-        return Response(data=data, status=status.HTTP_200_OK)
-
-    @action(methods=['get', 'post'], detail=True, url_path='shops/(?P<shop_id>[^/.]+)/products/(?P<product_id>[^/.]+)')
-    def product_detail(self, request, pk=None, shop_id=None, product_id=None):
-        queryset = Product.objects.filter(pk=product_id)
-        data = ProductDetailSerializer(queryset, many=True).data
-        return Response(data=data, status=status.HTTP_200_OK)
+    def retrieve(self, request, user_pk=None, shop_pk=None, pk=None):
+        obj = self.queryset.filter(shop=shop_pk).prefetch_related(
+            'shop').filter(pk=pk)
+        if obj.exists():
+            data = ProductDetailSerializer(obj, many=True).data
+            return Response(data=data, status=status.HTTP_200_OK)
+        else:
+            data = {'Message': "Not Foud"}
+            return Response(data=data, status=status.HTTP_404_NOT_FOUND)

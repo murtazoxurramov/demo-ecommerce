@@ -16,7 +16,7 @@ class CustomModalViewSet(viewsets.ModelViewSet):
         return queryset
 
 
-class ProductModelViewSet(CustomModalViewSet):
+class ProductViewSet(CustomModalViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductListSerializer
     pagination_class = None
