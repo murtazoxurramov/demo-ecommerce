@@ -30,6 +30,7 @@ class VendorProfileViewSet(CustomModalViewSet):
 class VendorProfileShopsViewSet(CustomModalViewSet):
     queryset = Shop.objects.all()
     serializer_class = ShopListSerializer
+    http_method_names = ['get']
 
     def list(self, request, user_pk=None):
         obj = Shop.objects.filter(owner=user_pk).prefetch_related('owner')
@@ -50,6 +51,7 @@ class VendorProfileShopsViewSet(CustomModalViewSet):
 class VendorProdileProducts(CustomModalViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductListSerializer
+    http_method_names = ['get']
 
     def list(self, request, user_pk=None, shop_pk=None):
         obj = self.queryset.filter(shop=shop_pk).prefetch_related('shop')
